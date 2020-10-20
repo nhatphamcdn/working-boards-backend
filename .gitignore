@@ -1,0 +1,7 @@
+node_modules
+keys
+logs
+migrations
+.env
+.env.development
+package-lock.json
