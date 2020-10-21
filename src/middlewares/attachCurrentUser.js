@@ -1,6 +1,8 @@
-import {
-  Logger
-} from 'winston';
+import catchAsync from '../helpers/catchAsync';
+import UserService from '../services/user.service'
+
+// Create instance userSerivce
+const userService = new UserService();
 
 /**
  * Attach user to req.currentUser
@@ -8,26 +10,15 @@ import {
  * @param {*} res  Express res Object
  * @param {*} next  Express next Function
  */
-const attachCurrentUser = async (req, res, next) => {
-  // try {
-  //   const UserModel = null; //Instance User sequelize
-  //   const userRecord = await UserModel.findById(req.token.id);
-  //   if (!userRecord) {
-  //     return res.sendStatus(401);
-  //   }
-  //   const currentUser = userRecord.toObject();
-  //   req.currentUser = currentUser;
-  //   return next();
-  // } catch (e) {
-  //   Logger.error('🔥 Error attaching user to req: %o', e);
-  //   return next(e);
-  // }
-  req.currentUser = {
-    name: 'Nhat Pham',
-    age: 25,
-    gender: 1
-  };
+const attachCurrentUser = catchAsync(async (req, res, next) => {
+  const user = await userService.getCurrentUser(req.token.id)
+
+  if (!user) {
+    return res.sendStatus(401);
+  }
+
+  req.currentUser = user;
   return next();
-};
+});
 
 export default attachCurrentUser;

@@ -2,6 +2,9 @@
 const {
   Model
 } = require('sequelize');
+
+import bcrypt from 'bcryptjs';
+
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
     /**
@@ -19,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         through: projectUser
       });
 
-      users.hasMany(attachment, {
+      user.hasMany(attachment, {
         as: 'attachments'
       })
     }
@@ -32,5 +35,11 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'user',
   });
+
+  // Hook before create user call bcrypt password
+  user.beforeCreate(user => {
+    user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10), null);
+  });
+
   return user;
 };

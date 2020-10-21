@@ -5,3 +5,4 @@ migrations
 .env
 .env.development
 package-lock.json
+.vscode
