@@ -1,4 +1,4 @@
-import catchAsync from '../helpers/catchAsync';
+import catchAsync from '../helpers/catchAsync.helper';
 import UserService from '../services/user.service'
 
 // Create instance userSerivce

@@ -18,6 +18,9 @@ export default {
    */
   jwtSecret: env.JWT_SECRET,
   jwtAlgorithm: env.JWT_ALGO,
+  tokenLife: env.TOKEN_LIFE,
+  jwtSecretRefresh: env.JWT_SECRET_REFRESH,
+  tokenLifeRefresh: env.TOKEN_REFRESH_LIFE,
 
   /**
    * Used by winston logger

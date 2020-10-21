@@ -3,7 +3,7 @@ import {
 } from 'express';
 import middlewares from '../middlewares';
 import UserController from '../controllers/user.controller';
-import catchAsync from '../helpers/catchAsync';
+import catchAsync from '../helpers/catchAsync.helper';
 const route = Router();
 
 export default (app) => {
