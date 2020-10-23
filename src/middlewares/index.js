@@ -1,7 +1,7 @@
 import attachCurrentUser from './attachCurrentUser';
-import isAuth from './isAuth';
+import verifyAccessToken from './verifyAccessToken';
 
 export default {
-  isAuth,
+  verifyAccessToken,
   attachCurrentUser
 };

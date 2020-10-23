@@ -16,11 +16,8 @@ export default {
   /**
    * Your secret sauce
    */
-  jwtSecret: env.JWT_SECRET,
-  jwtAlgorithm: env.JWT_ALGO,
-  tokenLife: env.TOKEN_LIFE,
-  jwtSecretRefresh: env.JWT_SECRET_REFRESH,
-  tokenLifeRefresh: env.TOKEN_REFRESH_LIFE,
+  accessToken: env.ACCESS_TOKEN,
+  refreshToken: env.REFRESH_TOKEN,
 
   /**
    * Used by winston logger

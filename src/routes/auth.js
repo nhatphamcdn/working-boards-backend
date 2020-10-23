@@ -16,4 +16,5 @@ export default (app) => {
   const authController = new AuthController();
   route.post('/sign-in', validation(signInValidate), catchAsync((req, res, next) => authController.signIn(res, req.body)));
   route.post('/sign-up', validation(createUserValidate), catchAsync((req, res, next) => authController.signUp(res, req.body)));
+  route.delete('/logout', middlewares.verifyAccessToken, catchAsync((req, res, next) => authController.logout(res, req.body)));
 };

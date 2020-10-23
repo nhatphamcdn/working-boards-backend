@@ -1,7 +1,14 @@
-import { user } from "../models";
-import bcrypt from 'bcryptjs';
+import {
+  user
+} from "../models";
 import _ from "lodash";
-import { generateToken } from '../helpers/jwt.helper';
+import bcrypt from 'bcryptjs';
+import createError from 'http-errors';
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken
+} from '../helpers/jwt.helper';
 
 export default class AuthService {
   constructor() {
@@ -15,7 +22,7 @@ export default class AuthService {
   async signUp(payload) {
     global.logger.silly('AuthService@signUp: Find or create user');
     // Find or create user
-    const [ userRecord, created ] = await this.user.findOrCreate({
+    const [userRecord, created] = await this.user.findOrCreate({
       where: {
         email: payload.email
       },
@@ -28,15 +35,24 @@ export default class AuthService {
       global.logger.silly('AuthService@signUp: User already exist');
       throw new Error('User already exist');
     }
-    //  Generating JWT
+    //  Generating Access token and Refresh token
     global.logger.silly('AuthService@signUp: Generating JWT');
-    const token = generateToken(userRecord);
-    global.logger.silly('AuthService@signUp: User already exist');
+    const accessToken = await signAccessToken(userRecord.id);
+    const refreshToken = await signRefreshToken(userRecord.id);
+    global.logger.silly('AuthService@signUp: Return token');
     const user = _.omit(userRecord.toJSON(), ["password"]);
-    return { user, token };
+
+    return {
+      user,
+      accessToken,
+      refreshToken
+    };
   }
 
-  async signIn({email, password}) {
+  async signIn({
+    email,
+    password
+  }) {
     const userRecord = await this.user.findOne({
       where: {
         email: email
@@ -44,19 +60,57 @@ export default class AuthService {
     });
 
     global.logger.silly('Checking user');
-    if (!userRecord || !bcrypt.compareSync(password, userRecord.password)) {
-      throw new Error('User not found');
+    if (!userRecord) {
+      throw createError.NotFound('User not exist');
     }
 
-    /**
-     * We use verify from argon2 to prevent 'timing based' attacks
-     */
-    global.logger.silly('Password is valid... Generating JWT');
-    const token = generateToken(userRecord);
+    if (!bcrypt.compareSync(password, userRecord.password)) {
+      throw createError.NotFound('Invalid password');
+    }
+
+    global.logger.silly('AuthService@signIn: Generating JWT');
+    const accessToken = await signAccessToken(userRecord.id);
+    const refreshToken = await signRefreshToken(userRecord.id);
     const user = _.omit(userRecord.toJSON(), ["password"]);
-    /**
-     * Easy as pie, you don't need passport.js anymore :)
-     */
-    return { user, token };
+
+    return {
+      user,
+      accessToken,
+      refreshToken
+    };
+  }
+
+  async refreshToken({
+    refreshToken
+  }) {
+    global.logger.silly('AuthService@refreshToken: Check exist refresh token.');
+    if (!refreshToken) {
+      throw createError.BadRequest();
+    }
+
+    global.logger.silly('AuthService@refreshToken: Verify refresh token.');
+    const userId = await verifyRefreshToken(refreshToken)
+
+    global.logger.silly('AuthService@refreshToken: Generating JWT');
+    const accessToken = await signAccessToken(userId)
+    const refreshNewToken = await signRefreshToken(userId)
+
+
+    return {
+      accessToken,
+      refreshToken: refreshNewToken
+    };
+  }
+
+  logout({
+    refreshToken
+  }) {
+    global.logger.silly('AuthService@logout: Check exist refresh token.');
+    if (!refreshToken) {
+      throw createError.BadRequest();
+    }
+
+    global.logger.silly('AuthService@logout: Verify refresh token.');
+    return verifyRefreshToken(refreshToken)
   }
 }

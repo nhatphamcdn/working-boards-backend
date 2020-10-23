@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import config from '../config';
 import routes from '../routes';
 import Logger from './logger';
+import client from '../helpers/redis.helper';
 
 export default ({
   app

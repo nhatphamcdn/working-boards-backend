@@ -11,5 +11,5 @@ export default (app) => {
   // Create instance user
   const userController = new UserController();
 
-  route.get('/me', middlewares.isAuth, middlewares.attachCurrentUser, catchAsync((req, res, next) => userController.currentUser(res, req)));
+  route.get('/me', middlewares.verifyAccessToken, middlewares.attachCurrentUser, catchAsync((req, res, next) => userController.currentUser(res, req)));
 };
